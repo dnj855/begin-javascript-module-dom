@@ -18,8 +18,15 @@ class Board {
   initPixels() {
     for (let i = 0; i < Board.BOARD_SIZE[0] * Board.BOARD_SIZE[1]; i++) {
       const pixel = new Pixel(Board.COLORS[Board.COLORS.length - 1]);
+      pixel.element.addEventListener('click', () => {
+        this.onPixelClick(pixel);
+      });
       this.board.append(pixel.element);
     }
+  }
+
+  onPixelClick(pixel) {
+    pixel.color = this.colorPicker.currentColor;
   }
 }
 
@@ -32,6 +39,15 @@ class Pixel {
     this.element = document.createElement('div');
     this.element.style.background = color;
     this.element.classList.add(Pixel.PIXEL_CLASS);
+  }
+
+  get color() {
+    return this._color;
+  }
+
+  set color(newColor) {
+    this._color = newColor;
+    this.element.style.backgroundColor = newColor;
   }
 }
 
@@ -52,7 +68,17 @@ class ColorPicker {
       if (color === this.currentColor) {
         pixel.element.classList.add('active');
       }
+      pixel.element.addEventListener('click', () => {
+        this.onColorPickerClick(pixel.color);
+      });
       this.element.appendChild(pixel.element);
+    }
+  }
+
+  onColorPickerClick(color) {
+    this.currentColor = color;
+    for (const pixel of this.pixels) {
+      pixel.element.classList.toggle('active', pixel.color === this.currentColor);
     }
   }
 }
