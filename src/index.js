@@ -5,19 +5,23 @@ class Game {
   static TIME_TO_WAIT = 5000;
 
   constructor() {
-    // 🦁 Initialise un `ColorPicker`
+    this.colorPicker = new ColorPicker(Game.COLORS, Game.COLORS[0]);
+    this.board = undefined;
   }
 
   init() {
-    // 🦁 Récupère le board
-    // 💡 Définit le style suivant pour que ce soit beau
-    // ⚡️ this.board.style.gridTemplateColumns = `repeat(${Game.BOARD_SIZE[0]}, ${Game.PIXEL_SIZE}px)`;
-    // 🦁 Appelle la méthode this.initPixels()
-    // 🦁 Appelle la méthode this.colorPicker.initPixelPicker()
+    this.board = document.querySelector('#board');
+    this.board.style.gridTemplateColumns = `repeat(${Game.BOARD_SIZE[0]}, ${Game.PIXEL_SIZE}px)`;
+    this.initPixels();
+    this.colorPicker.initPixelPicker();
   }
 
-  // 🦁 Crée une méthode `initPixels`
-  // * Cette méthode doit, pour chaque pixel du board, créer un pixel et l'ajouter au board
+  initPixels() {
+    for (let i = 0; i < Game.BOARD_SIZE[0] * Game.BOARD_SIZE[1]; i++) {
+      const pixel = new Pixel(Game.COLORS[Game.COLORS.length - 1]);
+      this.board.append(pixel.element);
+    }
+  }
 }
 
 class Pixel {
@@ -25,26 +29,33 @@ class Pixel {
   static PIXEL_PICKER_CLASS = 'pixel-picker';
 
   constructor(color) {
-    // 🦁 Stocke la couleur dans _color
-    // 🦁 Crée un élément div qui sera stocké dans this.element
-    // * Définit la couleur du background de l'élément en `color`
-    // * Ajoute la classe `Pixel.PIXEL_CLASS` à l'élément
+    const _color = color;
+    this.element = document.createElement('div');
+    this.element.style.backgroundColor = _color;
+    this.element.classList.add(Pixel.PIXEL_CLASS);
   }
 }
 
 class ColorPicker {
   constructor(colors, currentColor) {
-    // 🦁 Stocke colors et currentColor
-    // 🦁 Initie un tableau de pixels
+    this.colors = colors;
+    this.currentColor = currentColor;
+    this.pixels = [];
   }
 
-  // 🦁 Crée une méthode `init`
-  // * Cette méthode va récupérer l'élément avec l'id `color-picker`
-  // * Pour chaque couleur, elle va créer un pixel et l'ajouter à l'élément récupéré
-  // * Pour chaque pixel, ajoute la classe `Pixel.PIXEL_PICKER_CLASS`
-  // * Si la couleur du pixel est égale à `currentColor`, ajoute la classe `active`
-  // * Ajoute le pixel à l'élément avec this.element.append
-  // * Stocke le pixel dans le tableau de pixels
+  initPixelPicker() {
+    const element = document.querySelector('#color-picker');
+
+    for (const color of Game.COLORS) {
+      const pixel = new Pixel(color);
+      pixel.element.classList.add(Pixel.PIXEL_PICKER_CLASS);
+      if (color === this.currentColor) {
+        pixel.element.classList.add('active');
+      }
+      this.pixels.push(pixel);
+      element.append(pixel.element);
+    }
+  }
 }
 
 const game = new Game();
