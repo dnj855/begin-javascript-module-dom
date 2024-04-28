@@ -6,6 +6,7 @@ class Board {
 
   constructor() {
     this.colorPicker = new ColorPicker(Board.COLORS, Board.COLORS[0]);
+    this.warning = new Warning(setTimeout(0));
   }
 
   init() {
@@ -13,6 +14,8 @@ class Board {
     this.board.style.gridTemplateColumns = `repeat(${Board.BOARD_SIZE[0]}, ${Board.PIXEL_SIZE}px)`;
     this.initPixels();
     this.colorPicker.init();
+    this.warning.init();
+    this.timeLeft = document.querySelector('#time-left');
   }
 
   initPixels() {
@@ -26,7 +29,32 @@ class Board {
   }
 
   onPixelClick(pixel) {
+    if (
+      this.lastPixelAddedDate &&
+      new Date() - this.lastPixelAddedDate < Board.TIME_TO_WAIT
+    ) {
+      this.warning.showWarning();
+      return;
+    }
     pixel.color = this.colorPicker.currentColor;
+    this.lastPixelAddedDate = new Date();
+    this.toggleTimeLeft();
+  }
+
+  toggleTimeLeft() {
+    let i = Number(Board.TIME_TO_WAIT / 1000);
+    const updateTimer = () => {
+      if (i > 0) {
+        this.timeLeft.innerText = `${i}s`;
+        i--;
+      } else {
+        this.timeLeft.innerText = '';
+        clearInterval(intervalId);
+      }
+    };
+
+    updateTimer(); // Call once immediately
+    const intervalId = setInterval(updateTimer, 1000); // Then start the interval
   }
 }
 
@@ -80,6 +108,23 @@ class ColorPicker {
     for (const pixel of this.pixels) {
       pixel.element.classList.toggle('active', pixel.color === this.currentColor);
     }
+  }
+}
+
+class Warning {
+  constructor(timeout) {
+    this.timeout = timeout;
+  }
+
+  init() {
+    this.element = document.querySelector('#warning');
+  }
+
+  showWarning() {
+    this.element.classList.remove('hidden');
+    setTimeout(() => {
+      this.element.classList.add('hidden');
+    }, 4000);
   }
 }
 
