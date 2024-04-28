@@ -6,15 +6,15 @@ class Board {
 
   constructor() {
     this.colorPicker = new ColorPicker(Board.COLORS, Board.COLORS[0]);
-    this.warning = new Warning(setTimeout(0));
+    this.warning = new Warning();
   }
 
   init() {
+    this.colorPicker.init();
+    this.warning.init();
     this.board = document.querySelector('#board');
     this.board.style.gridTemplateColumns = `repeat(${Board.BOARD_SIZE[0]}, ${Board.PIXEL_SIZE}px)`;
     this.initPixels();
-    this.colorPicker.init();
-    this.warning.init();
     this.timeLeft = document.querySelector('#time-left');
   }
 
@@ -42,19 +42,17 @@ class Board {
   }
 
   toggleTimeLeft() {
-    let i = Number(Board.TIME_TO_WAIT / 1000);
-    const updateTimer = () => {
+    let i = Board.TIME_TO_WAIT / 1000;
+    this.timeLeft.innerText = `${i}s`;
+    const intervalId = setInterval(() => {
+      i--;
       if (i > 0) {
         this.timeLeft.innerText = `${i}s`;
-        i--;
       } else {
         this.timeLeft.innerText = '';
         clearInterval(intervalId);
       }
-    };
-
-    updateTimer(); // Call once immediately
-    const intervalId = setInterval(updateTimer, 1000); // Then start the interval
+    }, 1000);
   }
 }
 
@@ -112,10 +110,6 @@ class ColorPicker {
 }
 
 class Warning {
-  constructor(timeout) {
-    this.timeout = timeout;
-  }
-
   init() {
     this.element = document.querySelector('#warning');
   }
